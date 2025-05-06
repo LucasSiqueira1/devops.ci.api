@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    volumes:
+      - db:/var/lib/mysql-db
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=my-sql-db
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=root
+    networks:
+      - my-net
+
+  first-image:
+    build:
+      context: . # diretorio do dockerfile
+    container_name: first
+    ports:
+      - 3001:3001
+      #espera o mysql-db existir
+    depends_on: 
+      - mysql-db
+    networks:
+      - my-net
+
+# nao é obrigatorio redes e volumes
+networks:
+  my-net:
+    name: my-net
+    external: true
+    driver: bridge
+
+
+volumes:
+  db:
