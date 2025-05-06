@@ -20,5 +20,5 @@ jobs:
           node-version: 18
           cache: "npm"
           # caso seja monorepo tem que definir o path para ele achar o yarn.lock por ex
-      - run: npm run ci
-      - run: npm run test
+      - run: npm ci
+      - run: npm test
