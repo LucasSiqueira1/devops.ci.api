@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - develop
 # executado após o on (trigger)
 jobs:
   build:
