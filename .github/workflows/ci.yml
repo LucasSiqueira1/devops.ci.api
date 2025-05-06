@@ -11,14 +11,18 @@ jobs:
   build:
     name: "Build and push"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [14, 16, 18]
 
     steps:
       # entra no repo, por isso dessa action
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ matrix.node }}
           cache: "npm"
           # caso seja monorepo tem que definir o path para ele achar o yarn.lock por ex
       - run: npm ci
       - run: npm test
+      # daria para plugar um sonar aqui por ex
