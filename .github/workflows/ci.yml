@@ -13,4 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # entra no repo, por isso dessa action
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+          # caso seja monorepo tem que definir o path para ele achar o yarn.lock por ex
+      - run: npm run ci
+      - run: npm run test
