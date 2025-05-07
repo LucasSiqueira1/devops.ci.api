@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         node: [16, 18]
+        # boa utilização em projetos frontend
 
     steps:
       # entra no repo, por isso dessa action
@@ -28,8 +29,13 @@ jobs:
       - run: npm test
       # daria para plugar um sonar aqui por ex
 
-      # o name é o nome que aparece na execução do job
+      # o name é o nome que aparece na execução do job, e pode ser qualquer coisa
       # o run é o comando que vai executar
       # o run pode ser um script ou um comando direto
+      - name: Generate tag
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
       - name: Build docker image
         run: docker build -t devops.ci.api:latest .
