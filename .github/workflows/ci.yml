@@ -39,5 +39,18 @@ jobs:
           SHA=$(echo $GITHUB_SHA | head -c7)
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          # está no secrets do repo no github
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          registry: docker.io
+          # o registry é o endereço do docker hub, se fosse outro registro teria que colocar o endereço completo
+
       - name: Build docker image
-        run: docker build -t devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
+        # o latest é a tag do commit
+        run: docker build -t siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
+
+      - name: Push docker image
+        run: docker push siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
