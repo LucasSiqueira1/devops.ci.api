@@ -12,17 +12,18 @@ jobs:
   build:
     name: "Build and push"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [16, 18]
-        # boa utilização em projetos frontend
+    # strategy:
+    #   matrix:
+    #     node: [16, 18]
+    # boa utilização em projetos frontend
 
     steps:
       # entra no repo, por isso dessa action
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          # node-version: ${{ matrix.node }}
+          node-version: 18
           cache: "npm"
           # caso seja monorepo tem que definir o path para ele achar o yarn.lock por ex
       - run: npm ci
@@ -48,9 +49,19 @@ jobs:
           registry: docker.io
           # o registry é o endereço do docker hub, se fosse outro registro teria que colocar o endereço completo
 
-      - name: Build docker image
-        # o latest é a tag do commit
-        run: docker build -t siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
+      # - name: Build docker image
+      #   # o latest é a tag do commit
+      #   run: docker build -t siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
 
-      - name: Push docker image
-        run: docker push siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
+      # - name: Push docker image
+      #   run: docker push siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}, siqueiralucas/devops.ci.api:latest
+          push: true
+          # o push é para fazer o push da imagem, se não colocar ele não faz o push
+          # o buildx é uma ferramenta do docker para fazer build de imagens, e o --platform é para definir a plataforma da imagem
+          # platforms: linux/amd64,linux/arm64
