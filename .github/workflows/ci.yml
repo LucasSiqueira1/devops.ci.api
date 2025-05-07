@@ -33,9 +33,11 @@ jobs:
       # o run é o comando que vai executar
       # o run pode ser um script ou um comando direto
       - name: Generate tag
+        # boa pratica quando se tem outputs
+        id: generate_tag
         run: |
           SHA=$(echo $GITHUB_SHA | head -c7)
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
       - name: Build docker image
-        run: docker build -t devops.ci.api:latest .
+        run: docker build -t devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
