@@ -1,12 +1,13 @@
 name: CI
 
 # tigger é a mudança na branch main
+# Determinar as branches ou eventos que acionam a execução da pipeline.
 on:
   push:
     branches:
       - main
       - develop
-# executado após o on (trigger)
+# executado após o on (trigger), Configurar as etapas de construção e implantação do projeto.
 jobs:
   build:
     name: "Build and push"
@@ -26,3 +27,9 @@ jobs:
       - run: npm ci
       - run: npm test
       # daria para plugar um sonar aqui por ex
+
+      # o name é o nome que aparece na execução do job
+      # o run é o comando que vai executar
+      # o run pode ser um script ou um comando direto
+      - name: Build docker image
+        run: docker build -t devops.ci.api:latest .
