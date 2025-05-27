@@ -64,7 +64,10 @@ jobs:
         #   docker push 132955064359.dkr.ecr.us-east-2.amazonaws.com/luks-ci/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
         env:
           REGISTRY: ${{steps.login-ecr.outputs.registry}}
-          TAG: ${{ steps.generate_tag.outputs.sha }}
+          TAG:
+            ${{ steps.generate_tag.outputs.sha }}
+
+            # pega o nome da imagem
         run: |
           docker build -t $REGISTRY/devops.ci.api:$TAG .
           docker push $REGISTRY/devops.ci.api:$TAG
@@ -77,7 +80,7 @@ jobs:
           REPOSITORY_NAME: ${{steps.checkout.outputs.repository}}
           IMAGE: ${{ steps.build-image.outputs.image }}
         with:
-          service: $REPOSITORY_NAME
+          service: devops-ci-api # nome do serviço que vai subir no app runner
           image: $IMAGE # Pode subir como env no github
           access-role-arn: arn:aws:iam::132955064359:role/app-runner-role # Pode subir como env no github
           region: us-east-2
