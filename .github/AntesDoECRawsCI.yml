@@ -55,14 +55,31 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build docker image
-        # tem uma forma melhor de fazer isso, que é pegando o output do login acima
-        # run: |
-        #   docker build -t 132955064359.dkr.ecr.us-east-2.amazonaws.com/luks-ci/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
-        #   docker push 132955064359.dkr.ecr.us-east-2.amazonaws.com/luks-ci/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
-        env:
-          REGISTRY: ${{steps.login-ecr.outputs.registry}}
-          TAG: ${{ steps.generate_tag.outputs.sha }}
-        run: |
-          docker build -t $REGISTRY/devops.ci.api:$TAG .
-          docker push $REGISTRY/devops.ci.api:$TAG
+      # - name: Build docker image
+      #   run: docker build -t siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
+# ---------------------- docker hub ----------------------
+# - name: Login to Docker Hub
+#   uses: docker/login-action@v3
+#   with:
+#     # está no secrets do repo no github
+#     username: ${{ secrets.DOCKER_USERNAME }}
+#     password: ${{ secrets.DOCKER_TOKEN }}
+#     registry: docker.io
+# o registry é o endereço do docker hub, se fosse outro registro teria que colocar o endereço completo
+
+# - name: Build docker image
+#   # o latest é a tag do commit
+#   run: docker build -t siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
+
+# - name: Push docker image
+#   run: docker push siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}
+
+# - name: Build and push docker image
+#   uses: docker/build-push-action@v5
+#   with:
+#     context: .
+#     tags: siqueiralucas/devops.ci.api:${{ steps.generate_tag.outputs.sha }}, siqueiralucas/devops.ci.api:latest
+#     push: true
+# o push é para fazer o push da imagem, se não colocar ele não faz o push
+# o buildx é uma ferramenta do docker para fazer build de imagens, e o --platform é para definir a plataforma da imagem
+# platforms: linux/amd64,linux/arm64
