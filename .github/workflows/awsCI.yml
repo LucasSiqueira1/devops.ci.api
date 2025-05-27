@@ -70,7 +70,7 @@ jobs:
             # pega o nome da imagem
         run: |
           REPO_NAME=${GITHUB_REPOSITORY##*/}
-          IMAGE_NAME=$REGISTRY/$REPO_NAME:$TAG
+          IMAGE_NAME="$REGISTRY/$REPO_NAME:$TAG"
 
           docker build -t IMAGE_NAME .
           docker tag IMAGE_NAME $REGISTRY/$REPO_NAME:latest
