@@ -25,6 +25,7 @@ jobs:
     steps:
       # entra no repo, por isso dessa action
       - uses: actions/checkout@v4
+        id: checkout
       - uses: actions/setup-node@v4
         with:
           # node-version: ${{ matrix.node }}
@@ -56,6 +57,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build docker image
+        id: build-image
         # tem uma forma melhor de fazer isso, que é pegando o output do login acima
         # run: |
         #   docker build -t 132955064359.dkr.ecr.us-east-2.amazonaws.com/luks-ci/devops.ci.api:${{ steps.generate_tag.outputs.sha }} .
@@ -66,3 +68,20 @@ jobs:
         run: |
           docker build -t $REGISTRY/devops.ci.api:$TAG .
           docker push $REGISTRY/devops.ci.api:$TAG
+          IMAGE=$(echo $REGISTRY/devops.ci.api:$TAG)
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Deploy to App Runner
+        uses: awslabs/amazon-app-runner-deploy@main
+        env:
+          REPOSITORY_NAME: ${{steps.checkout.outputs.repository}}
+          IMAGE: ${{ steps.build-image.outputs.image }}
+        with:
+          service: $REPOSITORY_NAME
+          image: $IMAGE # Pode subir como env no github
+          access-role-arn: arn:aws:iam::132955064359:role/app-runner-role # Pode subir como env no github
+          region: us-east-2
+          cpu: 1
+          memory: 2
+          port: 3000 # igual o dockerfile
+
