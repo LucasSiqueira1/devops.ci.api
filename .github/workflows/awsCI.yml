@@ -76,12 +76,9 @@ jobs:
 
       - name: Deploy to App Runner
         uses: awslabs/amazon-app-runner-deploy@main
-        env:
-          REPOSITORY_NAME: ${{steps.checkout.outputs.repository}}
-          IMAGE: ${{ steps.build-image.outputs.image }}
         with:
-          service: devops-ci-api # nome do serviço que vai subir no app runner
-          image: $IMAGE # Pode subir como env no github
+          service: ${{steps.checkout.outputs.repository}} # nome do serviço que vai subir no app runner
+          image: ${{ steps.build-image.outputs.image }}
           access-role-arn: arn:aws:iam::132955064359:role/app-runner-role # Pode subir como env no github
           region: us-east-2
           cpu: 1
