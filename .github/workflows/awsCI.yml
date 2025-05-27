@@ -73,11 +73,16 @@ jobs:
           docker push $REGISTRY/devops.ci.api:$TAG
           IMAGE=$(echo $REGISTRY/devops.ci.api:$TAG)
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
+      - name: Sanatize repository name
+        id: sanitize-repo-name
+        run: |
+          REPO_NAME=$(echo "${{ github.event.repository.name }}" | tr '.' '-')
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
 
       - name: Deploy to App Runner
         uses: awslabs/amazon-app-runner-deploy@main
         with:
-          service: ${{ github.event.repository.name.replace('.', '-') }} # nome do serviço que vai subir no app runner
+          service: ${{steps.sanitize-repo-name.repo_name}} # nome do serviço que vai subir no app runner
           image: ${{ steps.build-image.outputs.image }}
           access-role-arn: arn:aws:iam::132955064359:role/app-runner-role # Pode subir como env no github
           region: us-east-2
