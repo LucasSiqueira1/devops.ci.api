@@ -69,10 +69,14 @@ jobs:
 
             # pega o nome da imagem
         run: |
-          docker build -t $REGISTRY/devops.ci.api:$TAG .
-          docker push $REGISTRY/devops.ci.api:$TAG
-          IMAGE=$(echo $REGISTRY/devops.ci.api:$TAG)
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          IMAGE_NAME=$REGISTRY/$REPO_NAME:$TAG
+
+          docker build -t IMAGE_NAME .
+          docker tag IMAGE_NAME $REGISTRY/$REPO_NAME:latest
+          docker push --all-tags $REGISTRY/$REPO_NAME
+
+          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
       - name: Sanatize repository name
         id: sanitize-repo-name
@@ -81,13 +85,17 @@ jobs:
           echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
 
       - name: Deploy to App Runner
+        id: deploy-app-runner
         uses: awslabs/amazon-app-runner-deploy@main
         with:
-          service: ${{steps.sanitize-repo-name.outputs.repo_name}} # nome do serviço que vai subir no app runner
+          # service: ${{steps.sanitize-repo-name.outputs.repo_name}} # nome do serviço que vai subir no app runner
           image: ${{ steps.build-image.outputs.image }}
           access-role-arn: arn:aws:iam::132955064359:role/app-runner-role # Pode subir como env no github
           region: us-east-2
           cpu: 1
           memory: 2
           port: 3000 # igual o dockerfile
+          wait-for-service-stability-seconds: 1200
 
+      - name: Post deployment
+        run: echo "App Runner running... ${{ steps.deploy-app-runner.outputs.service-url }}"
